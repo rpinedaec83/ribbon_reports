@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/png" href="{{ asset('image/convergia_favicon.ico') }}" />
+    <title>
+      | CCV CONVERGIA VOICE |
+    </title>
+
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.5.3/css/bulma.min.css" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"
+    />
+    <link rel="stylesheet" href="{{ asset('theme/login/css/main.css') }}" />
+
+  </head>
+
+  <body>
+    <div class="columns is-vcentered">
+      <div class="login column is-4 ">
+        <section class="section">
+          <div class="has-text-centered">
+            <img class="login-logo" src="{{ asset('image/logo2.png') }}" />
+          </div>
+          <form method="POST" action="{{ route('/login') }}">
+            {{ csrfField() }}
+            <div class="field">
+              <label class="label">                <span style="color:purple">Email</span></label>
+              <div class="control has-icons-right">
+                <input class="input" type="text" name="email" required />
+                <span class="icon is-small is-right">
+                  <i class="fa fa-user"></i>
+                </span>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">                <span style="color:purple">Password</span></label>
+              <div class="control has-icons-right">
+                <input class="input" type="password" name="password" required />
+                <span class="icon is-small is-right">
+                  <i class="fa fa-key"></i>
+                </span>
+              </div>
+            </div>
+            <div class="has-text-centered">
+              <button class="button-cnv is-primary is-outlined" type="submit" name="Submit">Login</a>
+            </div>
+            <div class="has-text-centered">
+              {{--
+              <a href=""><span style="color:purple">Forgot your password?</span></a>
+              --}}
+            </div>
+          </form>
+        </section>
+      </div>
+      <div id="particles-js" class="interactive-bg column is-8">
+      </div>
+    </div>
+    <script src="{{ asset('theme/login/js/particles.js') }}">
+      
+    </script>
+    <script src="{{ asset('theme/login/js/main.js') }}">
+      
+    </script>
+  </body>
+
+</html>

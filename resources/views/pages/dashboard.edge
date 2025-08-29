@@ -1,0 +1,151 @@
+@layout({ title: 'Ribbon Reports', menu00: 'active bg-gradient-primary' })
+<meta name="csrf-token" content="{{ csrfToken }}">
+
+  <div class="row justify-content-center">
+    <br />
+    <div class="row">
+      <div class="col-2">
+      </div>
+      <div class="col-8">
+        <h1 class="text-center">
+          Dashboard
+        </h1>
+      </div>
+      <div class="col-2 text-end">
+      </div>
+    </div>
+    <hr />
+  </div>
+
+  <div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+      <div class="card" data-animation="true">
+        <div class="card-header bg-warning text-white">
+          <h5 class="font-weight-normal mt-3 text-white">
+            Upload File
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <a href="/upload" class="btn btn-lg w-100">
+            Go to Upload
+                  <i class="fa fa-sign-in" style="color:blue;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card" data-animation="true">
+        <div class="card-header bg-success">
+          <h5 class="font-weight-normal mt-3 text-white">
+            Report
+          </h5>
+        </div>
+        <div class="card-body text-center">
+          <a href="/report" class="btn btn-lg w-100">
+            Go to Report
+                  <i class="fa fa-sign-in" style="color:blue;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+<h2>Resumen Trunks</h2>
+<div id="totales-table"></div>
+<div class="my-4">
+  <form id="delete-date-form" class="d-flex align-items-center gap-2">
+    <label for="dateSelect" class="me-2 mb-0">Selecciona una fecha:</label>
+    <select id="dateSelect" class="form-select" required>
+      <option value="">-- Elige una fecha --</option>
+    </select>
+    <button type="submit" class="btn btn-danger ms-2">Eliminar registros de esa fecha</button>
+  </form>
+</div>
+@end
+
+
+@pushOnceTo('js')
+  <script>
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch('/report/totales')
+      .then(res => res.json())
+      .then(data => {
+        // Obtener fechas únicas
+        const fechasSet = new Set()
+        Object.values(data).forEach(datesObj => {
+          Object.keys(datesObj).forEach(date => fechasSet.add(date))
+        })
+        const fechas = Array.from(fechasSet)
+        // Llenar el select
+        const select = document.getElementById('dateSelect')
+        fechas.forEach(date => {
+          const opt = document.createElement('option')
+          opt.value = date
+          opt.textContent = date
+          select.appendChild(opt)
+        })
+
+        // Renderizar la tabla como antes
+        const table = document.createElement('table')
+        table.className = 'table table-bordered'
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Node</th>
+              <th>Date</th>
+              <th>Total IP Call Limit</th>
+              <th>Total Max Ingress Sustained Call Rate</th>
+              <th>Total Max Ingress Call Burst Size</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${
+              Object.entries(data).map(([node, dates]) =>
+                Object.entries(dates).map(([date, totals]) => `
+                  <tr>
+                    <td>${node}</td>
+                    <td>${date}</td>
+                    <td>${totals.totalIpCallLimit}</td>
+                    <td>${totals.totalMaxIngressSustainedCallRate}</td>
+                    <td>${totals.totalMaxIngressCallBurstSize}</td>
+                  </tr>
+                `).join('')
+              ).join('')
+            }
+          </tbody>
+        `
+        document.getElementById('totales-table').appendChild(table)
+      })
+
+    // Manejar el submit del formulario
+    document.addEventListener('DOMContentLoaded', function () {
+      const form = document.getElementById('delete-date-form')
+      if (form) {
+        form.addEventListener('submit', function (e) {
+          e.preventDefault()
+          const date = document.getElementById('dateSelect').value
+          if (!date) return alert('Selecciona una fecha')
+          if (!confirm(`¿Seguro que deseas eliminar todos los registros con fecha "${date}"?`)) return
+
+          fetch('/report/delete-by-date', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-TOKEN': csrfToken // Include the CSRF token here
+            },
+            body: JSON.stringify({ date })
+          })
+          .then(res => res.json())
+          .then(res => {
+            if (res.success) {
+              alert('Registros eliminados correctamente')
+              window.location.reload()
+            } else {
+              alert('Error al eliminar registros')
+            }
+          })
+        })
+      }
+    })
+  </script>
+@end

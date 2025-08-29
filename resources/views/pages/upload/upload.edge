@@ -1,0 +1,26 @@
+@layout({ title: 'Upload File', menu02: 'active bg-gradient-primary' })
+  <h1>
+    Subir archivo de trunks (.txt)
+  </h1>
+
+  @if(session.has('success'))
+    <div id="flash-success" class="flash-message flash-success">
+      {{ session.get('success') }}
+    </div>
+  @endif
+  
+  @if(session.has('error'))
+    <div id="flash-error" class="flash-message flash-error">
+      {{ session.get('error') }}
+    </div>
+  @endif
+  
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    {{ csrfField() }}
+    <input type="file" name="file" accept=".txt" required />
+    <br />    <br />
+    <button type="submit">Cargar archivo</button>
+  </form>
+
+  <br />
+@end
